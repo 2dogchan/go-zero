@@ -401,7 +401,7 @@ func (a *Analyzer) findDefinedType(name string) (spec.Type, error) {
 func (a *Analyzer) getType(expr *ast.BodyStmt, req bool) (spec.Type, error) {
 	body := expr.Body
 	if req && body.IsArrayType() {
-		return nil, ast.SyntaxError(body.Pos(), "request body must be struct")
+		//return nil, ast.SyntaxError(body.Pos(), "request body must be struct")
 	}
 
 	var tp spec.Type

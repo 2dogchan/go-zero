@@ -58,6 +58,8 @@ const (
 	propertyKeyBasePath                = "basePath"
 	propertyKeyWrapCodeMsg             = "wrapCodeMsg"
 	propertyKeyBizCodeEnumDescription  = "bizCodeEnumDescription"
+	propertyKeyReqExample              = "reqExample"
+	propertyKeyRespExample             = "respExample"
 )
 
 const (

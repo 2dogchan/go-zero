@@ -26,18 +26,29 @@ func jsonResponseFromType(ctx Context, atDoc apiSpec.AtDoc, tp apiSpec.Type) *sp
 		AdditionalProperties: mapFromGoType(ctx, tp),
 		Items:                itemsFromGoType(ctx, tp),
 	}
+
+	// 检查是否有 respExample
+	var example any
+	if respExample := getStringFromKVOrDefault(atDoc.Properties, propertyKeyRespExample, ""); respExample != "" {
+		example = parseExampleValue(respExample, tp)
+	}
+
 	if ctx.UseDefinitions {
 		structName, ok := containsStruct(tp)
 		if ok {
 			props.Ref = spec.MustCreateRef(getRefName(structName))
+			schema := &spec.Schema{
+				SchemaProps: wrapCodeMsgProps(ctx, props, atDoc),
+			}
+			if example != nil {
+				schema.Example = example
+			}
 			return &spec.Responses{
 				ResponsesProps: spec.ResponsesProps{
 					StatusCodeResponses: map[int]spec.Response{
 						http.StatusOK: {
 							ResponseProps: spec.ResponseProps{
-								Schema: &spec.Schema{
-									SchemaProps: wrapCodeMsgProps(ctx, props, atDoc),
-								},
+								Schema: schema,
 							},
 						},
 					},
@@ -49,14 +60,18 @@ func jsonResponseFromType(ctx Context, atDoc apiSpec.AtDoc, tp apiSpec.Type) *sp
 	p, _ := propertiesFromType(ctx, tp)
 	props.Type = typeFromGoType(ctx, tp)
 	props.Properties = p
+	schema := &spec.Schema{
+		SchemaProps: wrapCodeMsgProps(ctx, props, atDoc),
+	}
+	if example != nil {
+		schema.Example = example
+	}
 	return &spec.Responses{
 		ResponsesProps: spec.ResponsesProps{
 			StatusCodeResponses: map[int]spec.Response{
 				http.StatusOK: {
 					ResponseProps: spec.ResponseProps{
-						Schema: &spec.Schema{
-							SchemaProps: wrapCodeMsgProps(ctx, props, atDoc),
-						},
+						Schema: schema,
 					},
 				},
 			},
